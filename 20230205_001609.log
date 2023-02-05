@@ -1,0 +1,547 @@
+2023-02-05 00:16:14,147 - mmcls - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: win32
+Python: 3.7.13 (default, Mar 28 2022, 08:03:21) [MSC v.1916 64 bit (AMD64)]
+CUDA available: True
+GPU 0: GeForce GTX 1650
+CUDA_HOME: D:\ruanjian\cuda\deve
+NVCC: Cuda compilation tools, release 11.0, V11.0.194
+MSVC: 用于 x64 的 Microsoft (R) C/C++ 优化编译器 19.29.30146 版
+GCC: n/a
+PyTorch: 1.7.1+cu110
+PyTorch compiling details: PyTorch built with:
+  - C++ Version: 199711
+  - MSVC 192729112
+  - Intel(R) Math Kernel Library Version 2020.0.0 Product Build 20191125 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.6.0 (Git Hash 5ef631a030a6f73131c77892041042805a06064f)
+  - OpenMP 2019
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.0
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.0.4
+  - Magma 2.5.4
+  - Build settings: BLAS=MKL, BUILD_TYPE=Release, CXX_FLAGS=/DWIN32 /D_WINDOWS /GR /EHsc /w /bigobj -openmp:experimental -DNDEBUG -DUSE_FBGEMM -DUSE_VULKAN_WRAPPER, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, USE_CUDA=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=OFF, USE_NNPACK=OFF, USE_OPENMP=ON, 
+
+TorchVision: 0.8.2+cu110
+OpenCV: 4.6.0
+MMCV: 1.7.1
+MMCV Compiler: MSVC 192930146
+MMCV CUDA Compiler: 11.0
+MMClassification: 0.25.0+3d4f80d
+------------------------------------------------------------
+
+2023-02-05 00:16:14,147 - mmcls - INFO - Distributed training: False
+2023-02-05 00:16:15,023 - mmcls - INFO - Config:
+model = dict(
+    type='ImageClassifier',
+    backbone=dict(
+        type='ResNeSt',
+        depth=101,
+        num_stages=4,
+        stem_channels=128,
+        out_indices=(3, ),
+        style='pytorch'),
+    neck=dict(type='GlobalAveragePooling'),
+    head=dict(
+        type='LinearClsHead',
+        num_classes=5,
+        in_channels=2048,
+        loss=dict(
+            type='LabelSmoothLoss',
+            label_smooth_val=0.1,
+            num_classes=5,
+            reduction='mean',
+            loss_weight=1.0),
+        topk=(1, 5),
+        cal_acc=False))
+train_cfg = dict(mixup=dict(alpha=0.2, num_classes=5))
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=2, hooks=[dict(type='TensorboardLoggerHook')])
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = None
+resume_from = None
+workflow = [('train', 1)]
+dataset_type = 'CustomDataset'
+img_lighting_cfg = dict(
+    eigval=[55.4625, 4.794, 1.1475],
+    eigvec=[[-0.5675, 0.7192, 0.4009], [-0.5808, -0.0045, -0.814],
+            [-0.5836, -0.6948, 0.4203]],
+    alphastd=0.1,
+    to_rgb=True)
+policies = [
+    dict(type='AutoContrast', prob=0.5),
+    dict(type='Equalize', prob=0.5),
+    dict(type='Invert', prob=0.5),
+    dict(
+        type='Rotate',
+        magnitude_key='angle',
+        magnitude_range=(0, 30),
+        pad_val=0,
+        prob=0.5,
+        random_negative_prob=0.5),
+    dict(
+        type='Posterize',
+        magnitude_key='bits',
+        magnitude_range=(0, 4),
+        prob=0.5),
+    dict(
+        type='Solarize',
+        magnitude_key='thr',
+        magnitude_range=(0, 256),
+        prob=0.5),
+    dict(
+        type='SolarizeAdd',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 110),
+        thr=128,
+        prob=0.5),
+    dict(
+        type='ColorTransform',
+        magnitude_key='magnitude',
+        magnitude_range=(-0.9, 0.9),
+        prob=0.5,
+        random_negative_prob=0.0),
+    dict(
+        type='Contrast',
+        magnitude_key='magnitude',
+        magnitude_range=(-0.9, 0.9),
+        prob=0.5,
+        random_negative_prob=0.0),
+    dict(
+        type='Brightness',
+        magnitude_key='magnitude',
+        magnitude_range=(-0.9, 0.9),
+        prob=0.5,
+        random_negative_prob=0.0),
+    dict(
+        type='Sharpness',
+        magnitude_key='magnitude',
+        magnitude_range=(-0.9, 0.9),
+        prob=0.5,
+        random_negative_prob=0.0),
+    dict(
+        type='Shear',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='horizontal',
+        random_negative_prob=0.5),
+    dict(
+        type='Shear',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='vertical',
+        random_negative_prob=0.5),
+    dict(
+        type='Cutout',
+        magnitude_key='shape',
+        magnitude_range=(1, 41),
+        pad_val=0,
+        prob=0.5),
+    dict(
+        type='Translate',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='horizontal',
+        random_negative_prob=0.5,
+        interpolation='bicubic'),
+    dict(
+        type='Translate',
+        magnitude_key='magnitude',
+        magnitude_range=(0, 0.3),
+        pad_val=0,
+        prob=0.5,
+        direction='vertical',
+        random_negative_prob=0.5,
+        interpolation='bicubic')
+]
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='RandAugment',
+        policies=[
+            dict(type='AutoContrast', prob=0.5),
+            dict(type='Equalize', prob=0.5),
+            dict(type='Invert', prob=0.5),
+            dict(
+                type='Rotate',
+                magnitude_key='angle',
+                magnitude_range=(0, 30),
+                pad_val=0,
+                prob=0.5,
+                random_negative_prob=0.5),
+            dict(
+                type='Posterize',
+                magnitude_key='bits',
+                magnitude_range=(0, 4),
+                prob=0.5),
+            dict(
+                type='Solarize',
+                magnitude_key='thr',
+                magnitude_range=(0, 256),
+                prob=0.5),
+            dict(
+                type='SolarizeAdd',
+                magnitude_key='magnitude',
+                magnitude_range=(0, 110),
+                thr=128,
+                prob=0.5),
+            dict(
+                type='ColorTransform',
+                magnitude_key='magnitude',
+                magnitude_range=(-0.9, 0.9),
+                prob=0.5,
+                random_negative_prob=0.0),
+            dict(
+                type='Contrast',
+                magnitude_key='magnitude',
+                magnitude_range=(-0.9, 0.9),
+                prob=0.5,
+                random_negative_prob=0.0),
+            dict(
+                type='Brightness',
+                magnitude_key='magnitude',
+                magnitude_range=(-0.9, 0.9),
+                prob=0.5,
+                random_negative_prob=0.0),
+            dict(
+                type='Sharpness',
+                magnitude_key='magnitude',
+                magnitude_range=(-0.9, 0.9),
+                prob=0.5,
+                random_negative_prob=0.0),
+            dict(
+                type='Shear',
+                magnitude_key='magnitude',
+                magnitude_range=(0, 0.3),
+                pad_val=0,
+                prob=0.5,
+                direction='horizontal',
+                random_negative_prob=0.5),
+            dict(
+                type='Shear',
+                magnitude_key='magnitude',
+                magnitude_range=(0, 0.3),
+                pad_val=0,
+                prob=0.5,
+                direction='vertical',
+                random_negative_prob=0.5),
+            dict(
+                type='Cutout',
+                magnitude_key='shape',
+                magnitude_range=(1, 41),
+                pad_val=0,
+                prob=0.5),
+            dict(
+                type='Translate',
+                magnitude_key='magnitude',
+                magnitude_range=(0, 0.3),
+                pad_val=0,
+                prob=0.5,
+                direction='horizontal',
+                random_negative_prob=0.5,
+                interpolation='bicubic'),
+            dict(
+                type='Translate',
+                magnitude_key='magnitude',
+                magnitude_range=(0, 0.3),
+                pad_val=0,
+                prob=0.5,
+                direction='vertical',
+                random_negative_prob=0.5,
+                interpolation='bicubic')
+        ],
+        num_policies=2,
+        magnitude_level=12),
+    dict(
+        type='RandomResizedCrop',
+        size=416,
+        efficientnet_style=True,
+        interpolation='bicubic',
+        backend='pillow'),
+    dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+    dict(type='ColorJitter', brightness=0.4, contrast=0.4, saturation=0.4),
+    dict(
+        type='Lighting',
+        eigval=[55.4625, 4.794, 1.1475],
+        eigvec=[[-0.5675, 0.7192, 0.4009], [-0.5808, -0.0045, -0.814],
+                [-0.5836, -0.6948, 0.4203]],
+        alphastd=0.1,
+        to_rgb=True),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=False),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='ToTensor', keys=['gt_label']),
+    dict(type='Collect', keys=['img', 'gt_label'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='CenterCrop',
+        crop_size=416,
+        efficientnet_style=True,
+        interpolation='bicubic',
+        backend='pillow'),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='Collect', keys=['img'])
+]
+data = dict(
+    samples_per_gpu=2,
+    workers_per_gpu=0,
+    train=dict(
+        type='CustomDataset',
+        data_prefix=
+        'E:/python-project/other/mmclassification/data/flower_imagenet/train',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='RandAugment',
+                policies=[
+                    dict(type='AutoContrast', prob=0.5),
+                    dict(type='Equalize', prob=0.5),
+                    dict(type='Invert', prob=0.5),
+                    dict(
+                        type='Rotate',
+                        magnitude_key='angle',
+                        magnitude_range=(0, 30),
+                        pad_val=0,
+                        prob=0.5,
+                        random_negative_prob=0.5),
+                    dict(
+                        type='Posterize',
+                        magnitude_key='bits',
+                        magnitude_range=(0, 4),
+                        prob=0.5),
+                    dict(
+                        type='Solarize',
+                        magnitude_key='thr',
+                        magnitude_range=(0, 256),
+                        prob=0.5),
+                    dict(
+                        type='SolarizeAdd',
+                        magnitude_key='magnitude',
+                        magnitude_range=(0, 110),
+                        thr=128,
+                        prob=0.5),
+                    dict(
+                        type='ColorTransform',
+                        magnitude_key='magnitude',
+                        magnitude_range=(-0.9, 0.9),
+                        prob=0.5,
+                        random_negative_prob=0.0),
+                    dict(
+                        type='Contrast',
+                        magnitude_key='magnitude',
+                        magnitude_range=(-0.9, 0.9),
+                        prob=0.5,
+                        random_negative_prob=0.0),
+                    dict(
+                        type='Brightness',
+                        magnitude_key='magnitude',
+                        magnitude_range=(-0.9, 0.9),
+                        prob=0.5,
+                        random_negative_prob=0.0),
+                    dict(
+                        type='Sharpness',
+                        magnitude_key='magnitude',
+                        magnitude_range=(-0.9, 0.9),
+                        prob=0.5,
+                        random_negative_prob=0.0),
+                    dict(
+                        type='Shear',
+                        magnitude_key='magnitude',
+                        magnitude_range=(0, 0.3),
+                        pad_val=0,
+                        prob=0.5,
+                        direction='horizontal',
+                        random_negative_prob=0.5),
+                    dict(
+                        type='Shear',
+                        magnitude_key='magnitude',
+                        magnitude_range=(0, 0.3),
+                        pad_val=0,
+                        prob=0.5,
+                        direction='vertical',
+                        random_negative_prob=0.5),
+                    dict(
+                        type='Cutout',
+                        magnitude_key='shape',
+                        magnitude_range=(1, 41),
+                        pad_val=0,
+                        prob=0.5),
+                    dict(
+                        type='Translate',
+                        magnitude_key='magnitude',
+                        magnitude_range=(0, 0.3),
+                        pad_val=0,
+                        prob=0.5,
+                        direction='horizontal',
+                        random_negative_prob=0.5,
+                        interpolation='bicubic'),
+                    dict(
+                        type='Translate',
+                        magnitude_key='magnitude',
+                        magnitude_range=(0, 0.3),
+                        pad_val=0,
+                        prob=0.5,
+                        direction='vertical',
+                        random_negative_prob=0.5,
+                        interpolation='bicubic')
+                ],
+                num_policies=2,
+                magnitude_level=12),
+            dict(
+                type='RandomResizedCrop',
+                size=416,
+                efficientnet_style=True,
+                interpolation='bicubic',
+                backend='pillow'),
+            dict(type='RandomFlip', flip_prob=0.5, direction='horizontal'),
+            dict(
+                type='ColorJitter',
+                brightness=0.4,
+                contrast=0.4,
+                saturation=0.4),
+            dict(
+                type='Lighting',
+                eigval=[55.4625, 4.794, 1.1475],
+                eigvec=[[-0.5675, 0.7192, 0.4009], [-0.5808, -0.0045, -0.814],
+                        [-0.5836, -0.6948, 0.4203]],
+                alphastd=0.1,
+                to_rgb=True),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=False),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='ToTensor', keys=['gt_label']),
+            dict(type='Collect', keys=['img', 'gt_label'])
+        ]),
+    val=dict(
+        type='CustomDataset',
+        data_prefix=
+        'E:/python-project/other/mmclassification/data/flower_imagenet/val',
+        ann_file=
+        'E:/python-project/other/mmclassification/data/flower_imagenet/val.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='CenterCrop',
+                crop_size=416,
+                efficientnet_style=True,
+                interpolation='bicubic',
+                backend='pillow'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]),
+    test=dict(
+        type='CustomDataset',
+        data_prefix=
+        'E:/python-project/other/mmclassification/data/flower_imagenet/val',
+        ann_file=
+        'E:/python-project/other/mmclassification/data/flower_imagenet/val.txt',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='CenterCrop',
+                crop_size=416,
+                efficientnet_style=True,
+                interpolation='bicubic',
+                backend='pillow'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ]))
+evaluation = dict(interval=1, metric='accuracy')
+optimizer = dict(
+    type='SGD',
+    lr=0.01,
+    momentum=0.9,
+    weight_decay=0.0001,
+    paramwise_cfg=dict(bias_decay_mult=0.0, norm_decay_mult=0.0))
+optimizer_config = dict(grad_clip=None)
+lr_config = dict(
+    policy='CosineAnnealing',
+    min_lr=0,
+    warmup='linear',
+    warmup_iters=5,
+    warmup_ratio=1e-06,
+    warmup_by_epoch=True)
+runner = dict(type='EpochBasedRunner', max_epochs=270)
+work_dir = './work_dirs\my_resnest'
+gpu_ids = [0]
+
+2023-02-05 00:16:15,039 - mmcls - INFO - Set random seed to 98400654, deterministic: False
+2023-02-05 00:16:19,000 - mmcls - INFO - Start running, host: 86176@LAPTOP-D8UGO3K6, work_dir: E:\python-project\other\mmclassification\tools\work_dirs\my_resnest
+2023-02-05 00:16:19,001 - mmcls - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) CosineAnnealingLrUpdaterHook       
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) OptimizerHook                      
+(NORMAL      ) CheckpointHook                     
+(LOW         ) IterTimerHook                      
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(LOW         ) EvalHook                           
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_epoch:
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+after_run:
+(VERY_LOW    ) TensorboardLoggerHook              
+ -------------------- 
+2023-02-05 00:16:19,001 - mmcls - INFO - workflow: [('train', 1)], max: 270 epochs
+2023-02-05 00:16:19,001 - mmcls - INFO - Checkpoints will be saved to E:\python-project\other\mmclassification\tools\work_dirs\my_resnest by HardDiskBackend.
